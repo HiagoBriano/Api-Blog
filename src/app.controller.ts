@@ -7,6 +7,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 export class AppController {
   @Get()
   @ApiOkResponse({
+    status: 200,
     example: { success: true, message: 'Server is running', data: [] },
   })
   getStatus(): AppResponse {
