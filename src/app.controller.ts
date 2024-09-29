@@ -23,16 +23,9 @@ export class AppController {
   @Get()
   @ApiOkResponse({
     status: 200,
-    example: { success: true, message: 'Server is running', data: [] },
+    example: { success: true, message: 'Server is running', data: null },
   })
   getStatus(): AppResponse {
-    return { success: true, message: 'Server is running', data: [] };
-  }
-
-  @Post('jin')
-  olaMundo(@Body() body: Validate): AppResponse {
-    console.log(body);
-
-    return { success: true, message: 'OK', data: body };
+    return { success: true, message: 'Server is running', data: null };
   }
 }

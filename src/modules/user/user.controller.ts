@@ -19,4 +19,12 @@ export class UserController {
       data: response,
     };
   }
+
+  // async create(@Body() body: findAllUserDTO): Promise<AppResponse> {
+  //   return {
+  //     success: true,
+  //     message: 'user created successfully',
+  //     data: null,
+  //   };
+  // }
 }
