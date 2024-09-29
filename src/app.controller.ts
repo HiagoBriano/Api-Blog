@@ -1,6 +1,21 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import AppResponse from './app.interface';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { IsString } from '@nestjs/class-validator';
+
+class Validate {
+  @IsString()
+  @ApiProperty({ example: 'Jin' })
+  name: string;
+
+  @IsString()
+  @ApiProperty({ example: 'jiin@example.com' })
+  email: string;
+
+  @IsString()
+  @ApiProperty({ example: '123456' })
+  password: string;
+}
 
 @ApiTags('Status')
 @Controller()
@@ -12,5 +27,12 @@ export class AppController {
   })
   getStatus(): AppResponse {
     return { success: true, message: 'Server is running', data: [] };
+  }
+
+  @Post('jin')
+  olaMundo(@Body() body: Validate): AppResponse {
+    console.log(body);
+
+    return { success: true, message: 'OK', data: body };
   }
 }

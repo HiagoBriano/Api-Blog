@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id        String     @id @default(uuid())
-  type      UserType
+  role      role       @default(CLIENT)
   email     String     @unique
   password  String
   photo     String?
@@ -17,11 +17,12 @@ model User {
   status    UserStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
 
   @@map("users")
 }
 
-enum UserType {
+enum role {
   CLIENT
   ADMIN
 }
