@@ -13,6 +13,10 @@ export class UserController {
   @ApiOperation({ summary: 'Criação de usuário' })
   async create(@Body() body: CreateUserDTO): Promise<AppResponse> {
     const response = await this.userService.create(body);
-    return { success: true, message: 'Server is running', data: response };
+    return {
+      success: true,
+      message: 'user created successfully',
+      data: response,
+    };
   }
 }

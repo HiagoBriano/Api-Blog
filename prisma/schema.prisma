@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id        String     @id @default(uuid())
-  role      role       @default(CLIENT)
+  role      roles      @default(USER)
   email     String     @unique
   password  String
   photo     String?
@@ -22,8 +22,8 @@ model User {
   @@map("users")
 }
 
-enum role {
-  CLIENT
+enum roles {
+  USER
   ADMIN
 }
 
