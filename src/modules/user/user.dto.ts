@@ -1,12 +1,14 @@
-import { FileType, FileTypeDTO } from 'src/infra/providers/storage/storage.dto';
-import { Type } from '@nestjs/class-transformer';
+import { ImageDTO } from 'src/infra/validation/image.dto';
+import { Transform } from '@nestjs/class-transformer';
+import IsFile from 'src/infra/validation/validFile';
 import { ApiProperty } from '@nestjs/swagger';
 import { $Enums } from '@prisma/client';
 import {
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
-  Matches,
+  Length,
   ValidateNested,
 } from '@nestjs/class-validator';
 
@@ -22,33 +24,20 @@ export class PayloadDTO {
   role: $Enums.roles;
 }
 
-export class ImageTypeDTO extends FileTypeDTO {
-  @IsString()
-  @IsNotEmpty()
-  @Matches(/^image\/(jpeg|png)$/, {
-    message: 'Invalid file type, allowed: jpeg, png',
-  })
-  mime: string;
-}
-
-export class ImageDTO extends FileType {
-  @IsNotEmpty()
-  @ValidateNested()
-  @Type(() => ImageTypeDTO)
-  fileType: ImageTypeDTO;
-}
-
 export class CreateUserDTO {
   @IsString()
   @ApiProperty({ example: 'Jin Gustavo' })
+  @Length(3)
   name: string;
 
   @IsString()
   @ApiProperty({ example: 'JinGus' })
+  @Length(5, 10)
   userName: string;
 
   @IsString()
   @ApiProperty({ example: 'jin@example.com' })
+  @Transform(({ value }) => value.toLowerCase())
   email: string;
 
   @IsString()
@@ -72,6 +61,16 @@ export class findAllUserDTO {
   @IsString()
   @IsOptional()
   role?: $Enums.roles;
+
+  @IsInt()
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  page?: number;
+
+  @IsInt()
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  pageSize?: number;
 }
 
 export class findUniqueUserDTO {
@@ -91,11 +90,13 @@ export class findUniqueUserDTO {
 export class UpdateUserDTO {
   @IsString()
   @IsOptional()
+  @Length(5, 10)
   userName?: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty({ example: 'jin@example.com' })
+  @Transform(({ value }) => value.toLowerCase())
   email?: string;
 
   @IsString()
@@ -107,4 +108,16 @@ export class UpdateUserDTO {
   @IsOptional()
   @ApiProperty({ example: '11954614344' })
   phone?: string;
+}
+
+export class updatePhotoDTO {
+  @IsNotEmpty()
+  @ValidateNested()
+  @IsFile({ mime: ['image/jpeg', 'image/jpg', 'image/png'] })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'Arquivo de imagem nos formatos JPEG, JPG ou PNG',
+  })
+  photo: ImageDTO;
 }

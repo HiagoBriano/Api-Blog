@@ -7,12 +7,28 @@ import {
   UpdateUserDTO,
 } from './user.dto';
 
+const select = {
+  id: true,
+  name: true,
+  userName: true,
+  email: true,
+  phone: true,
+  photo: true,
+  status: true,
+  role: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+};
 @Injectable()
 export class UserRepository {
   constructor(private readonly Prisma: PrismaService) {}
 
   async create(data: CreateUserDTO) {
-    return await this.Prisma.user.create({ data });
+    return await this.Prisma.user.create({
+      data,
+      select,
+    });
   }
 
   async findUnique({ id, email, userName }: findUniqueUserDTO) {
@@ -20,31 +36,44 @@ export class UserRepository {
       where: {
         ...(id && { id }),
         ...(email && { email }),
-        ...(userName && { userName: { mode: 'insensitive' } }),
+        ...(userName && { userName }),
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        photo: true,
-        status: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-        deletedAt: true,
-      },
+      select,
     });
   }
 
-  async findAll({ email, name, role }: findAllUserDTO) {
-    return await this.Prisma.user.findMany({
+  async findAll({
+    email,
+    name,
+    role,
+    page = 1,
+    pageSize = 10,
+  }: findAllUserDTO) {
+    const response = await this.Prisma.user.findMany({
+      where: {
+        ...(email && { email: { contains: email, mode: 'insensitive' } }),
+        ...(name && { name: { contains: name, mode: 'insensitive' } }),
+        ...(role && { role }),
+      },
+      select,
+      orderBy: [{ name: 'asc' }],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+
+    const total = await this.Prisma.user.count({
       where: {
         ...(email && { email: { contains: email, mode: 'insensitive' } }),
         ...(name && { name: { contains: name, mode: 'insensitive' } }),
         ...(role && { role }),
       },
     });
+
+    return {
+      total,
+      totalPages: page ? Math.ceil(total / pageSize) : 1,
+      data: response,
+    };
   }
 
   async updatePhoto(id: string, photo: string) {
@@ -55,6 +84,7 @@ export class UserRepository {
       data: {
         photo,
       },
+      select,
     });
   }
 
@@ -72,6 +102,7 @@ export class UserRepository {
         ...(phone && { phone }),
         ...(userName && { userName }),
       },
+      select,
     });
   }
 
@@ -80,6 +111,7 @@ export class UserRepository {
       where: {
         id,
       },
+      select,
     });
   }
 }

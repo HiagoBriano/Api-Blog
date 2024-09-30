@@ -4,8 +4,9 @@ import { Request } from 'express';
 import {
   CanActivate,
   ExecutionContext,
+  HttpException,
+  HttpStatus,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 
 @Injectable()
@@ -16,7 +17,16 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 
-    if (token === undefined) throw new UnauthorizedException();
+    if (token === undefined) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Unauthorized',
+          data: null,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
 
     try {
       const payload: PayloadDTO = await this.jwtService.verifyAsync(token, {
@@ -27,7 +37,14 @@ export class AuthGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      throw new UnauthorizedException();
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Unauthorized',
+          data: null,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 

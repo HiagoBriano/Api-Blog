@@ -1,19 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { FileType } from 'src/infra/providers/storage/storage.dto';
+import { ImageSizeValidation } from 'src/infra/validation/imageSize';
 import { IStorage } from 'src/infra/providers/storage/storage';
 import { Types } from 'src/decorators/auth.decorators';
 import { UserRepository } from './user.repository';
 import { extname } from 'path';
+import { hash } from 'bcrypt';
 import {
   CreateUserDTO,
   findAllUserDTO,
   PayloadDTO,
   UpdateUserDTO,
 } from './user.dto';
+import { ImageDTO } from 'src/infra/validation/image.dto';
 
 @Injectable()
 export class UserService {
   constructor(
+    private imageSizeValidation: ImageSizeValidation,
     private readonly userRepository: UserRepository,
     private readonly storage: IStorage,
   ) {}
@@ -69,7 +72,8 @@ export class UserService {
       );
     }
 
-    return await this.userRepository.create(user);
+    const password = await hash(user.password, 10);
+    return await this.userRepository.create({ ...user, password });
   }
 
   async findUnique(id: string, data: PayloadDTO) {
@@ -93,7 +97,7 @@ export class UserService {
     return await this.userRepository.findAll(data);
   }
 
-  async updatePhoto(id: string, photo: FileType, user: PayloadDTO) {
+  async updatePhoto(id: string, photo: ImageDTO, user: PayloadDTO) {
     if (user.role !== Types.ADMIN) {
       if (user.sub !== id) {
         throw new HttpException(
@@ -106,6 +110,8 @@ export class UserService {
         );
       }
     }
+
+    photo = await this.imageSizeValidation.transform(photo);
 
     const extFile = extname(photo.originalName);
     photo.originalName = `${id}.${extFile}`;
@@ -129,6 +135,10 @@ export class UserService {
       }
     }
 
+    if (data.password) {
+      data.password = await hash(data.password, 10);
+    }
+
     try {
       return await this.userRepository.update(id, data);
     } catch (error) {
@@ -143,7 +153,18 @@ export class UserService {
     }
   }
 
-  async delete(data: PayloadDTO) {
-    return await this.userRepository.delete(data.sub);
+  async delete(id: string, data: PayloadDTO) {
+    if (data.role !== Types.ADMIN && data.sub !== id) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Unauthorized',
+          data: null,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    return await this.userRepository.delete(id);
   }
 }
