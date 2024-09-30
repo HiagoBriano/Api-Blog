@@ -1,9 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ImageSizeValidation } from 'src/infra/validation/imageSize';
 import { IStorage } from 'src/infra/providers/storage/storage';
+import { ImageDTO } from 'src/infra/validation/image.dto';
 import { Types } from 'src/decorators/auth.decorators';
 import { UserRepository } from './user.repository';
-import { extname } from 'path';
+import { JwtService } from '@nestjs/jwt';
 import { hash } from 'bcrypt';
 import {
   CreateUserDTO,
@@ -11,13 +12,13 @@ import {
   PayloadDTO,
   UpdateUserDTO,
 } from './user.dto';
-import { ImageDTO } from 'src/infra/validation/image.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     private imageSizeValidation: ImageSizeValidation,
     private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtService,
     private readonly storage: IStorage,
   ) {}
 
@@ -73,7 +74,20 @@ export class UserService {
     }
 
     const password = await hash(user.password, 10);
-    return await this.userRepository.create({ ...user, password });
+    const userCreated = await this.userRepository.create({ ...user, password });
+
+    const payload: PayloadDTO = {
+      sub: userCreated.id,
+      email: userCreated.email,
+      role: userCreated.role,
+    };
+
+    const token = await this.jwtService.signAsync(payload);
+
+    return {
+      access_token: token,
+      ...userCreated,
+    };
   }
 
   async findUnique(id: string, data: PayloadDTO) {
@@ -90,7 +104,20 @@ export class UserService {
       }
     }
 
-    return await this.userRepository.findUnique({ id });
+    const user = await this.userRepository.findUnique({ id });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          success: false,
+          message: 'user not found',
+          data: null,
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return user;
   }
 
   async findAll(data: findAllUserDTO) {
@@ -113,10 +140,9 @@ export class UserService {
 
     photo = await this.imageSizeValidation.transform(photo);
 
-    const extFile = extname(photo.originalName);
-    photo.originalName = `${id}.${extFile}`;
+    photo.originalName = `${id}.${photo.fileType.ext}`;
 
-    const imageUrl = await this.storage.uploadFile(photo, 'photo-users/');
+    const imageUrl = await this.storage.uploadFile(photo, 'avatars');
 
     return await this.userRepository.updatePhoto(id, imageUrl);
   }

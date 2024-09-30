@@ -6,12 +6,12 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    UserModule,
     JwtModule.register({
       global: true,
       secret: process.env.SECRET_KEY,
       signOptions: { expiresIn: '5h' },
     }),
+    UserModule,
     AuthModule,
   ],
   controllers: [AppController],

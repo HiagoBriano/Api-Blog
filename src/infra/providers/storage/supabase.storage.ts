@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { IStorage } from './storage';
 import { FileType } from './storage.dto';
 @Injectable()
@@ -21,7 +21,18 @@ export class SupabaseStorage implements IStorage {
       .from(process.env.SUPABASE_BUCKET ?? '')
       .upload(`${folder}/${file.originalName}`, file.buffer, { upsert: true });
 
-    if (response.error) throw new Error(`Error uploading file`);
+    if (response.error) {
+      console.log(response.error);
+
+      throw new HttpException(
+        {
+          success: false,
+          message: 'Error uploading file',
+          data: null,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
 
     const { data } = this.cliente.storage
       .from(process.env.SUPABASE_BUCKET ?? '')

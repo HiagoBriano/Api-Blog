@@ -13,6 +13,7 @@ export const createSchema_201 = {
     createdAt: '2024-09-29T21:28:17.403Z',
     updatedAt: '2024-09-29T21:28:17.403Z',
     deletedAt: null,
+    access_token: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9',
   },
 };
 
@@ -50,6 +51,12 @@ export const unauthorized_401 = {
   success: false,
   message: 'Unauthorized',
   data: null,
+};
+
+export const forbidden_403 = {
+  message: 'Forbidden resource',
+  error: 'Forbidden',
+  statusCode: 403,
 };
 
 export const updatePhotoSchema_200 = {

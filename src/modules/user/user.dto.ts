@@ -1,16 +1,16 @@
 import { ImageDTO } from 'src/infra/validation/image.dto';
-import { Transform } from '@nestjs/class-transformer';
-import IsFile from 'src/infra/validation/validFile';
+import { Transform, Type } from '@nestjs/class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { $Enums } from '@prisma/client';
 import {
   IsInt,
-  IsNotEmpty,
   IsOptional,
   IsString,
   Length,
-  ValidateNested,
+  Matches,
 } from '@nestjs/class-validator';
+
+const emailRegex = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i;
 
 // Conteúdo codificado do JWT
 export class PayloadDTO {
@@ -18,6 +18,7 @@ export class PayloadDTO {
   sub: string;
 
   @IsString()
+  @Matches(emailRegex)
   email: string;
 
   @IsString()
@@ -38,6 +39,7 @@ export class CreateUserDTO {
   @IsString()
   @ApiProperty({ example: 'jin@example.com' })
   @Transform(({ value }) => value.toLowerCase())
+  @Matches(emailRegex)
   email: string;
 
   @IsString()
@@ -52,6 +54,7 @@ export class CreateUserDTO {
 export class findAllUserDTO {
   @IsString()
   @IsOptional()
+  @Matches(emailRegex)
   email?: string;
 
   @IsString()
@@ -80,6 +83,7 @@ export class findUniqueUserDTO {
 
   @IsString()
   @IsOptional()
+  @Matches(emailRegex)
   email?: string;
 
   @IsString()
@@ -97,6 +101,7 @@ export class UpdateUserDTO {
   @IsOptional()
   @ApiProperty({ example: 'jin@example.com' })
   @Transform(({ value }) => value.toLowerCase())
+  @Matches(emailRegex)
   email?: string;
 
   @IsString()
@@ -111,13 +116,12 @@ export class UpdateUserDTO {
 }
 
 export class updatePhotoDTO {
-  @IsNotEmpty()
-  @ValidateNested()
-  @IsFile({ mime: ['image/jpeg', 'image/jpg', 'image/png'] })
+  // @IsFile({ mime: ['image/jpeg', 'image/jpg', 'image/png'] })
   @ApiProperty({
     type: 'string',
     format: 'binary',
     description: 'Arquivo de imagem nos formatos JPEG, JPG ou PNG',
   })
-  photo: ImageDTO;
+  @Type(() => ImageDTO)
+  photo: any;
 }

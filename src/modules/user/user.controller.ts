@@ -1,11 +1,13 @@
 import { Auth, Types } from 'src/decorators/auth.decorators';
-import { FormDataRequest } from 'nestjs-form-data';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageDTO } from 'src/infra/validation/image.dto';
 import { UserService } from './user.service';
 import AppResponse from 'src/app.interface';
 import { $Enums } from '@prisma/client';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
@@ -21,6 +23,7 @@ import {
   deleteSchema_200,
   findAllSchema_200,
   findByIdSchema_200,
+  forbidden_403,
   unauthorized_401,
   updatePhotoSchema_200,
 } from './user.schema';
@@ -35,6 +38,8 @@ import {
   Put,
   Query,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   CreateUserDTO,
@@ -81,9 +86,10 @@ export class UserController {
     description: 'Todos os usuários',
     example: findAllSchema_200,
   })
-  @ApiUnauthorizedResponse({
+  @ApiResponse({
+    status: 403,
     description: 'Não autorizado',
-    example: unauthorized_401,
+    example: forbidden_403,
   })
   async findAll(@Query() query: findAllUserDTO): Promise<AppResponse> {
     const response = await this.userService.findAll(query);
@@ -106,6 +112,11 @@ export class UserController {
     description: 'Não autorizado',
     example: unauthorized_401,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Não autorizado',
+    example: forbidden_403,
+  })
   @ApiOperation({ summary: 'Buscar dados do usuário' })
   async findById(
     @Param('id') id: string,
@@ -122,28 +133,43 @@ export class UserController {
 
   @Patch(':id')
   @ApiBearerAuth()
-  @FormDataRequest()
   @Auth(Types.ADMIN, Types.USER)
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('photo'))
   @ApiOperation({ summary: 'Atualizar foto do usuário' })
   @ApiOkResponse({
     example: updatePhotoSchema_200,
-    description: 'Todos os usuários',
+    description: 'Foto atualizado com sucesso',
   })
   @ApiUnauthorizedResponse({
     description: 'Não autorizado',
     example: unauthorized_401,
   })
+  @ApiResponse({
+    status: 403,
+    description: 'Não autorizado',
+    example: forbidden_403,
+  })
+  @ApiBody({
+    description: 'Upload de uma nova foto (JPEG, JPG, PNG)',
+    type: updatePhotoDTO,
+  })
   async updatePhoto(
     @Param('id') id: string,
-    @Body() body: updatePhotoDTO,
+    @UploadedFile() file: Express.Multer.File,
     @Request() req: { user: PayloadDTO },
   ): Promise<AppResponse> {
-    const response = await this.userService.updatePhoto(
-      id,
-      body.photo,
-      req.user,
-    );
+    // Transformar para o DTO manualmente
+    const photo: ImageDTO = {
+      originalName: file.originalname,
+      encoding: file.encoding,
+      busBoyMimeType: file.mimetype,
+      buffer: file.buffer,
+      size: file.size,
+      fileType: { ext: file.mimetype.split('/')[1], mime: file.mimetype },
+    };
+
+    const response = await this.userService.updatePhoto(id, photo, req.user);
 
     return {
       success: true,
@@ -154,6 +180,7 @@ export class UserController {
 
   @Put(':id')
   @ApiBearerAuth()
+  @Auth(Types.ADMIN, Types.USER)
   @ApiOperation({ summary: 'Atualizar dados do usuário' })
   @ApiResponse({
     status: 200,
@@ -163,6 +190,11 @@ export class UserController {
   @ApiUnauthorizedResponse({
     description: 'Não autorizado',
     example: unauthorized_401,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Não autorizado',
+    example: forbidden_403,
   })
   async update(
     @Param('id') id: string,
@@ -190,6 +222,11 @@ export class UserController {
   @ApiUnauthorizedResponse({
     description: 'Não autorizado',
     example: unauthorized_401,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Não autorizado',
+    example: forbidden_403,
   })
   async delete(
     @Param('id') id: string,
