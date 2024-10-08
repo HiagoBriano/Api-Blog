@@ -4,7 +4,6 @@ export const createSchema_201 = {
   data: {
     id: 'fed37ebe-1028-49ee-ab14-59e37e11d7d7',
     name: 'Jin Gustavo',
-    userName: 'JinGus',
     email: 'jin@example.com',
     photo: 'https://img.odcdn.com.br/wp-content/uploads/2022/08/fotografo.jpg',
     phone: '11954614344',
@@ -33,7 +32,6 @@ export const findAllSchema_200 = {
       {
         id: 'fed37ebe-1028-49ee-ab14-59e37e11d7d7',
         name: 'Jin Gustavo',
-        userName: 'JinGus',
         email: 'jin@example.com',
         phone: '11954614344',
         photo: null,
@@ -65,7 +63,6 @@ export const updatePhotoSchema_200 = {
   data: {
     id: 'fed37ebe-1028-49ee-ab14-59e37e11d7d7',
     name: 'Jin Gustavo',
-    userName: 'JinGus',
     email: 'jin@example.com',
     photo: 'https://img.odcdn.com.br/wp-content/uploads/2022/08/fotografo.jpg',
     phone: '11954614344',
@@ -89,7 +86,6 @@ export const findByIdSchema_200 = {
   data: {
     id: 'fed37ebe-1028-49ee-ab14-59e37e11d7d7',
     name: 'Jin Gustavo',
-    userName: 'JinGus',
     email: 'jin@example.com',
     photo: 'https://img.odcdn.com.br/wp-content/uploads/2022/08/fotografo.jpg',
     phone: '11954614344',
@@ -107,7 +103,6 @@ export const updateSchema_200 = {
   data: {
     id: 'fed37ebe-1028-49ee-ab14-59e37e11d7d7',
     name: 'Jin Gustavo',
-    userName: 'JinGus',
     email: 'jin@example.com',
     photo: 'https://img.odcdn.com.br/wp-content/uploads/2022/08/fotografo.jpg',
     phone: '11954614344',

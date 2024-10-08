@@ -10,7 +10,6 @@ export const signInSchema_200 = {
   data: {
     id: 'fed37ebe-1028-49ee-ab14-59e37e11d7d7',
     name: 'Jin Gustavo',
-    userName: 'JinGus',
     email: 'jin@example.com',
     photo: 'https://img.odcdn.com.br/wp-content/uploads/2022/08/fotografo.jpg',
     phone: '11954614344',

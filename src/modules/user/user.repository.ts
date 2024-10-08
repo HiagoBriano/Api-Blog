@@ -10,7 +10,6 @@ import {
 const select = {
   id: true,
   name: true,
-  userName: true,
   email: true,
   phone: true,
   photo: true,
@@ -31,12 +30,11 @@ export class UserRepository {
     });
   }
 
-  async findUnique({ id, email, userName }: findUniqueUserDTO) {
+  async findUnique({ id, email }: findUniqueUserDTO) {
     return await this.Prisma.user.findUnique({
       where: {
         ...(id && { id }),
         ...(email && { email }),
-        ...(userName && { userName }),
       },
       select,
     });
@@ -88,10 +86,7 @@ export class UserRepository {
     });
   }
 
-  async update(
-    id: string,
-    { email, password, phone, userName }: UpdateUserDTO,
-  ) {
+  async update(id: string, { email, password, phone }: UpdateUserDTO) {
     return await this.Prisma.user.update({
       where: {
         id,
@@ -100,7 +95,6 @@ export class UserRepository {
         ...(email && { email }),
         ...(password && { password }),
         ...(phone && { phone }),
-        ...(userName && { userName }),
       },
       select,
     });

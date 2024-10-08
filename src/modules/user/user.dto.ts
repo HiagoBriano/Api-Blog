@@ -32,11 +32,6 @@ export class CreateUserDTO {
   name: string;
 
   @IsString()
-  @ApiProperty({ example: 'JinGus' })
-  @Length(5, 10)
-  userName: string;
-
-  @IsString()
   @ApiProperty({ example: 'jin@example.com' })
   @Transform(({ value }) => value.toLowerCase())
   @Matches(emailRegex)
@@ -85,18 +80,9 @@ export class findUniqueUserDTO {
   @IsOptional()
   @Matches(emailRegex)
   email?: string;
-
-  @IsString()
-  @IsOptional()
-  userName?: string;
 }
 
 export class UpdateUserDTO {
-  @IsString()
-  @IsOptional()
-  @Length(5, 10)
-  userName?: string;
-
   @IsString()
   @IsOptional()
   @ApiProperty({ example: 'jin@example.com' })

@@ -22,28 +22,8 @@ export class UserService {
     private readonly storage: IStorage,
   ) {}
 
-  async checkUserName(userName: string) {
-    const userExists = await this.userRepository.findUnique({
-      userName,
-    });
-
-    if (userExists) {
-      return {
-        success: true,
-        message: 'userName already registered',
-        data: null,
-      };
-    }
-
-    return {
-      success: true,
-      message: 'free userName',
-      data: null,
-    };
-  }
-
   async create(user: CreateUserDTO) {
-    let userExists = await this.userRepository.findUnique({
+    const userExists = await this.userRepository.findUnique({
       email: user.email,
     });
 
@@ -52,21 +32,6 @@ export class UserService {
         {
           success: false,
           message: 'email already registered',
-          data: null,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    userExists = await this.userRepository.findUnique({
-      userName: user.userName,
-    });
-
-    if (userExists) {
-      throw new HttpException(
-        {
-          success: false,
-          message: 'userName already registered',
           data: null,
         },
         HttpStatus.BAD_REQUEST,
