@@ -14,14 +14,68 @@ model User {
   email     String     @unique
   password  String
   photo     String?
-  phone     String
+  phone     String?
   role      roles      @default(USER)
   status    UserStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   deletedAt DateTime?
 
+  posts Post[]
+
   @@map("users")
+}
+
+model Post {
+  id               String    @id @default(uuid())
+  title            String
+  subtitle         String
+  slug             String    @unique
+  content          String
+  author           User      @relation(fields: [authorId], references: [id])
+  authorId         String
+  photo            String?
+  photoDescription String?   @map("photo_description")
+  language         Languages
+  published        Boolean   @default(false)
+  publishedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  @@map("posts")
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("tags")
+}
+
+model Newsletter {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("newsletters")
 }
 
 enum roles {
@@ -33,4 +87,9 @@ enum UserStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
+}
+
+enum Languages {
+  ptBR
+  enUS
 }

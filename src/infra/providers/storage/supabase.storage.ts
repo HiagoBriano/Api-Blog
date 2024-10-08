@@ -22,8 +22,6 @@ export class SupabaseStorage implements IStorage {
       .upload(`${folder}/${file.originalName}`, file.buffer, { upsert: true });
 
     if (response.error) {
-      console.log(response.error);
-
       throw new HttpException(
         {
           success: false,
