@@ -14,6 +14,12 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: ['http://localhost:3000', 'https://app-blog-red.vercel.app'],
+    methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Blog - API')
     .setDescription(

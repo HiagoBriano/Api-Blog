@@ -10,7 +10,7 @@ import {
   Matches,
 } from '@nestjs/class-validator';
 
-const emailRegex = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i;
+const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
 
 // Conteúdo codificado do JWT
 export class PayloadDTO {
@@ -34,7 +34,7 @@ export class CreateUserDTO {
   @IsString()
   @ApiProperty({ example: 'jin@example.com' })
   @Transform(({ value }) => value.toLowerCase())
-  @Matches(emailRegex)
+  @Matches(emailRegex, { message: 'Invalid email' })
   email: string;
 
   @IsString()
@@ -45,7 +45,7 @@ export class CreateUserDTO {
 export class findAllUserDTO {
   @IsString()
   @IsOptional()
-  @Matches(emailRegex)
+  @Matches(emailRegex, { message: 'Invalid email' })
   email?: string;
 
   @IsString()
