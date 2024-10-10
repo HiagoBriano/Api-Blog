@@ -33,6 +33,7 @@ export class UserRepository {
   async findUnique({ id, email }: findUniqueUserDTO) {
     return await this.Prisma.user.findUnique({
       where: {
+        deletedAt: null,
         ...(id && { id }),
         ...(email && { email }),
       },
@@ -49,6 +50,7 @@ export class UserRepository {
   }: findAllUserDTO) {
     const response = await this.Prisma.user.findMany({
       where: {
+        deletedAt: null,
         ...(email && { email: { contains: email, mode: 'insensitive' } }),
         ...(name && { name: { contains: name, mode: 'insensitive' } }),
         ...(role && { role }),
@@ -101,9 +103,13 @@ export class UserRepository {
   }
 
   async delete(id: string) {
-    return await this.Prisma.user.delete({
+    return await this.Prisma.user.update({
       where: {
         id,
+      },
+      data: {
+        email: null,
+        deletedAt: new Date(),
       },
       select,
     });

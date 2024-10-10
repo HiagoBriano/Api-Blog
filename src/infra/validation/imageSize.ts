@@ -14,12 +14,14 @@ export class ImageSizeValidation {
         .resize({ width: 800 })
         .toBuffer();
 
-      if (resizedBuffer.length > MAX_SIZE) {
-        throw new BadRequestException('Image size must be less than 500 KB');
-      }
+      // if (resizedBuffer.length > MAX_SIZE) {
+      //   throw new BadRequestException('Image size must be less than 500 KB');
+      // }
 
-      image.buffer = resizedBuffer;
-      image.size = resizedBuffer.length;
+      if (resizedBuffer.length < image.buffer.length) {
+        image.buffer = resizedBuffer;
+        image.size = resizedBuffer.length;
+      }
     }
 
     return image;

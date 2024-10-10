@@ -99,7 +99,7 @@ export const findByIdSchema_200 = {
 
 export const updateSchema_200 = {
   success: true,
-  message: 'user created successfully',
+  message: 'User updated successfully',
   data: {
     id: 'fed37ebe-1028-49ee-ab14-59e37e11d7d7',
     name: 'Jin Gustavo',

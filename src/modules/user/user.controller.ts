@@ -26,6 +26,7 @@ import {
   forbidden_403,
   unauthorized_401,
   updatePhotoSchema_200,
+  updateSchema_200,
 } from './user.schema';
 import {
   Body,
@@ -50,7 +51,7 @@ import {
 } from './user.dto';
 
 @Controller('/users')
-@ApiTags('Users')
+@ApiTags('Usuário')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -103,7 +104,7 @@ export class UserController {
 
   @Get(':id')
   @ApiBearerAuth()
-  @Auth(Types.ADMIN, Types.USER)
+  @Auth(Types.ADMIN, Types.USER, Types.PENMANT)
   @ApiOkResponse({
     description: 'usuário encontrado',
     example: findByIdSchema_200,
@@ -121,7 +122,7 @@ export class UserController {
   async findById(
     @Param('id') id: string,
     @Request() req: { user: PayloadDTO },
-  ) {
+  ): Promise<AppResponse> {
     const response = await this.userService.findUnique(id, req.user);
 
     return {
@@ -133,7 +134,7 @@ export class UserController {
 
   @Patch(':id')
   @ApiBearerAuth()
-  @Auth(Types.ADMIN, Types.USER)
+  @Auth(Types.ADMIN, Types.USER, Types.PENMANT)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('photo'))
   @ApiOperation({ summary: 'Atualizar foto do usuário' })
@@ -180,21 +181,12 @@ export class UserController {
 
   @Put(':id')
   @ApiBearerAuth()
-  @Auth(Types.ADMIN, Types.USER)
+  @Auth(Types.ADMIN, Types.USER, Types.PENMANT)
   @ApiOperation({ summary: 'Atualizar dados do usuário' })
   @ApiResponse({
     status: 200,
     description: 'Atualizado com sucesso',
-    example: deleteSchema_200,
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Não autorizado',
-    example: unauthorized_401,
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Não autorizado',
-    example: forbidden_403,
+    example: updateSchema_200,
   })
   async update(
     @Param('id') id: string,
@@ -218,15 +210,6 @@ export class UserController {
     status: 200,
     description: 'Usuário excluído com sucesso',
     example: deleteSchema_200,
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Não autorizado',
-    example: unauthorized_401,
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Não autorizado',
-    example: forbidden_403,
   })
   async delete(
     @Param('id') id: string,

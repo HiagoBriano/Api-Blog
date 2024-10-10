@@ -7,6 +7,7 @@ export const ROLES_KEY = 'roles';
 export enum Types {
   USER = 'USER',
   ADMIN = 'ADMIN',
+  PENMANT = 'PENMANENT',
 }
 
 export function Auth(...roles: Types[]) {
