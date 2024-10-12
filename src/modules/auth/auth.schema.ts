@@ -6,7 +6,7 @@ export const unauthorized_401 = {
 
 export const signInSchema_200 = {
   success: true,
-  message: 'user created successfully',
+  message: 'Login realizado com sucesso',
   data: {
     id: 'fed37ebe-1028-49ee-ab14-59e37e11d7d7',
     name: 'Jin Gustavo',
