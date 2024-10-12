@@ -88,13 +88,13 @@ export class UserRepository {
     });
   }
 
-  async update(id: string, { email, password, phone }: UpdateUserDTO) {
+  async update(id: string, { name, password, phone }: UpdateUserDTO) {
     return await this.Prisma.user.update({
       where: {
         id,
       },
       data: {
-        ...(email && { email }),
+        ...(name && { name }),
         ...(password && { password }),
         ...(phone && { phone }),
       },

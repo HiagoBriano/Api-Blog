@@ -81,10 +81,8 @@ export class findUniqueUserDTO {
 export class UpdateUserDTO {
   @IsString()
   @IsOptional()
-  @ApiProperty({ example: 'jin@example.com' })
-  @Transform(({ value }) => value.toLowerCase())
-  @Matches(emailRegex)
-  email?: string;
+  @ApiProperty({ example: 'Jin Oliveira' })
+  name?: string;
 
   @IsString()
   @IsOptional()
